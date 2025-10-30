@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   ScrollView,
@@ -13,6 +13,8 @@ import { MovieDetailScreenProps } from '@/navigation/types';
 import {Button, LoadingSpinner} from '@/components/common';
 import {Colors, Typography, Spacing, BorderRadius, FontWeights} from '@/theme';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { moviesSlice, selectIsInWatchlist, selectMovieDetails, useAppDispatch, useAppSelector, watchlistSlice } from '@/store';
+import { buildBackdropUrl, buildImageUrl } from '@/api/tmdb';
 
 /**
  * Movie Detail Screen
@@ -22,58 +24,114 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BACKDROP_HEIGHT = SCREEN_WIDTH * 0.56; // 16:9 aspect ratio
 
-const MovieDetailScreen: React.FC<MovieDetailScreenProps> = () => {
+const MovieDetailScreen: React.FC<MovieDetailScreenProps> = ({route}) => {
+  const dispatch = useAppDispatch();
+  const {movieId} = route.params;
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const isInWatchlist = false; // TODO determine if movie is in watchlist
+  // Get movie details from store
+  const movie = useAppSelector(selectMovieDetails(movieId));
+  const isInWatchlist = useAppSelector(selectIsInWatchlist(movieId));
 
-  // TODO replace with actual movie data
-  const movie = {
-    id: 1,
-    title: 'Tmp Movie Title',
-    release_date: '2025-10-30',
-    runtime: 120,
-    vote_average: 7.8,
-    vote_count: 1500,
-    genres: [{id: 1, name: 'Action'}, {id: 2, name: 'Adventure'}],
-    backdrop_path: '',
-    poster_path: '',
-    tagline: 'An epic rea ct native application.',
-    overview:
-      'This is a short descrition of the movie plot. It can be very long or very very short depending on the movie. It gives an overview of what the movie is about. It can be 2-3 lines long or less or more...',
-    original_language: 'en',
-  }
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   /**
-   * TODO Load movie details
+   * Load movie details on mount
    */
-  // useEffect(() => {
-  // }, []);
+  useEffect(() => {
+    if (!movie) {
+      loadDetails();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [movieId]);
+
+  /**
+   * Fetch movie details
+   */
+  const loadDetails = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await dispatch(moviesSlice.loadMovieDetails(movieId)).unwrap();
+    } catch (err) {
+      setError('Failed to load movie details');
+      console.error('Failed to load movie details:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Toggle watchlist status
+   */
+  const handleWatchlistToggle = () => {
+    if (!movie) {
+      return;
+    }
+
+    if (isInWatchlist) {
+      dispatch(watchlistSlice.removeFromWatchlist(movieId));
+    } else {
+      // Convert MovieDetails to Movie for watchlist
+      dispatch(watchlistSlice.addToWatchlist({
+        id: movie.id,
+        title: movie.title,
+        overview: movie.overview,
+        poster_path: movie.poster_path,
+        backdrop_path: movie.backdrop_path,
+        release_date: movie.release_date,
+        vote_average: movie.vote_average,
+        vote_count: movie.vote_count,
+        genre_ids: movie.genres.map(g => g.id),
+        original_language: movie.original_language,
+      }));
+    }
+  };
 
   /**
    * Show loading spinner on initial load
    */
-  if (loading) {
+  if (loading || !movie) {
     return <LoadingSpinner fullScreen message="Loading movie details..." />;
   }
+
+  /**
+   * Show error state
+   */
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+        <Button title="Retry" onPress={loadDetails} />
+      </View>
+    );
+  }
+
+  const backdropUrl = buildBackdropUrl(movie.backdrop_path, 'w780');
+  const posterUrl = buildImageUrl(movie.poster_path, 'w500');
 
   return (
     <ScrollView style={styles.container}>
       {/* Backdrop Image */}
-      <Image
-        source={{uri: movie.backdrop_path}}
-        style={styles.backdropImg}
-        resizeMode="cover"
-      />
+      {backdropUrl && (
+        <Image
+          source={{uri: backdropUrl}}
+          style={styles.backdropImg}
+          resizeMode="cover"
+        />
+      )}
+
 
       <View style={styles.content}>
         {/* Poster and Basic Info */}
         <View style={styles.headerSection}>
-          <Image
-            source={{uri: movie.poster_path}}
-            style={styles.movieImg}
-            resizeMode="cover"
-          />
+          {posterUrl && (
+            <Image
+              source={{uri: posterUrl}}
+              style={styles.movieImg}
+              resizeMode="cover"
+            />
+          )}
 
           <View style={styles.headerInfo}>
             <Text style={styles.title}>{movie.title}</Text>
@@ -107,7 +165,7 @@ const MovieDetailScreen: React.FC<MovieDetailScreenProps> = () => {
         {/* Watchlist Button */}
         <Button
           title={isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
-          onPress={() => {}} // TODO implement watchlist functionality
+          onPress={handleWatchlistToggle}
           variant={isInWatchlist ? 'outline' : 'primary'}
           style={styles.watchlistButton}
         />
@@ -246,6 +304,19 @@ const styles = StyleSheet.create({
     ...Typography.body,
     color: Colors.text.primary,
     flex: 1,
+  },
+  errorContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.xl,
+  },
+  errorText: {
+    ...Typography.body,
+    color: Colors.error,
+    marginBottom: Spacing.base,
+    textAlign: 'center',
   },
 });
 

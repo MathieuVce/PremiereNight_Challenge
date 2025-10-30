@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   FlatList,
@@ -15,49 +15,69 @@ import { WatchlistScreenProps } from '@/navigation/types';
 import {LoadingSpinner} from '@/components/common';
 import {Colors, Typography, Spacing, BorderRadius, FontWeights} from '@/theme';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { selectWatchlistItems, useAppDispatch, useAppSelector, WatchlistItem, watchlistSlice } from '@/store';
+import { buildImageUrl } from '@/api/tmdb';
 
 /**
  * Watchlist Screen
  * Displays the user's saved movies with options to view or remove.
  */
 
-const watchlistItems = Array.from({ length: 5 }, (_, i) => ({
-  id: i + 1,
-  title: `Tmp Movie Name ${i + 1}`,
-  release_date: "2025-10-30",
-  overview:
-    'This is a short description of the movie plot. It can be very long or very very short depending on the movie.',
-  poster_path: "",
-})); // TODO replace with actual watchlist items
-
 const WatchlistScreen: React.FC<WatchlistScreenProps> = ({navigation}) => {
+  const dispatch = useAppDispatch();
+
+  const watchlistItems = useAppSelector(selectWatchlistItems);
   const [loading, setLoading] = useState<boolean>(false);
 
   /**
-   * TODO load watchlist
+   * Load watchlist on mount
    */
-  // useEffect(() => {
-  // }, []);
+  useEffect(() => {
+    loadWatchlistData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /**
+   * Load watchlist from storage
+   */
+  const loadWatchlistData = async () => {
+    try {
+      await dispatch(watchlistSlice.loadWatchlist()).unwrap();
+    } catch (err) {
+      console.error('Failed to load watchlist:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /**
    * Navigate to movie detail
    */
-  const handleMoviePress = () => {
-    navigation.navigate(ROUTES.SCREEN_MOVIE_DETAILS);
+  const handleMoviePress = (movieId: number) => {
+    navigation.navigate(ROUTES.SCREEN_MOVIE_DETAILS, {movieId});
+  };
+
+  /**
+   * Remove movie from watchlist
+   */
+  const handleRemove = (movieId: number) => {
+    dispatch(watchlistSlice.removeFromWatchlist(movieId));
   };
 
   /**
    * Render each watchlist item
    */
-  const renderItem: ListRenderItem = ({item}) => {
+  const renderItem: ListRenderItem<WatchlistItem> = ({item}) => {
+    const posterUrl = buildImageUrl(item.poster_path, 'w185');
+
     return (
       <TouchableOpacity
         style={styles.itemContainer}
-        onPress={() => handleMoviePress()}
+        onPress={() => handleMoviePress(item.id)}
         activeOpacity={0.8}>
         {/* Poster */}
-        {item.poster_path ? (
-          <Image source={{uri: item.poster_path}} style={styles.img} />
+        {posterUrl ? (
+          <Image source={{uri: posterUrl}} style={styles.img} />
         ) : (
           <View style={styles.imgPlaceholder}>
             <Text style={styles.placeholderText}>No Image</Text>
@@ -82,7 +102,7 @@ const WatchlistScreen: React.FC<WatchlistScreenProps> = ({navigation}) => {
         {/* Remove Button */}
         <TouchableOpacity
           style={styles.removeButton}
-          onPress={() => {}} // TODO implement remove from watchlist
+          onPress={() => handleRemove(item.id)}
           >
           <Icon name="close" size={20} color={Colors.text.primary} />
         </TouchableOpacity>
@@ -93,7 +113,7 @@ const WatchlistScreen: React.FC<WatchlistScreenProps> = ({navigation}) => {
   /**
    * Extract unique key for each item
    */
-  const keyExtractor = (item) => item.id.toString();
+  const keyExtractor = (item: WatchlistItem) => item.id.toString();
 
   /**
    * Empty component
@@ -194,6 +214,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.error,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  removeButtonText: {
+    color: Colors.text.primary,
+    fontSize: 20,
+    fontWeight: FontWeights.semibold,
+    lineHeight: 24,
   },
   emptyContainer: {
     flex: 1,

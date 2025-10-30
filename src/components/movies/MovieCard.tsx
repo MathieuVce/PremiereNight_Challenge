@@ -1,19 +1,12 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {Colors, Typography, Spacing, BorderRadius, Shadows, scale} from '@/theme';
+import { buildImageUrl, Movie } from '@/api/tmdb';
 
 /**
  * MovieCard Component
  * Displays a movie poster with title in a card format.
  */
-
-// TODO get type from API
-type Movie = {
-  id: number;
-  title: string;
-  poster_path: string | null;
-  release_date: string;
-};
 
 export interface MovieCardProps {
   movie: Movie;
@@ -37,6 +30,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
   testID,
 }) => {
   const height = width * ASPECT_RATIO;
+  const imageUrl = buildImageUrl(movie.poster_path, 'w342');
 
   return (
     <TouchableOpacity
@@ -45,9 +39,9 @@ const MovieCard: React.FC<MovieCardProps> = ({
       activeOpacity={0.8}
       testID={testID}>
       <View style={[styles.posterContainer, {width, height}]}>
-        {movie.poster_path ? (
+        {imageUrl ? (
           <Image
-            source={{uri: movie.poster_path}}
+            source={{uri: imageUrl}}
             style={styles.poster}
             resizeMode="cover"
           />

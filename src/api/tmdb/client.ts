@@ -21,6 +21,7 @@ const createClient = (): AxiosInstance => {
     timeout: TMDB_CONFIG.timeout,
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${TMDB_CONFIG.apiKey}`
     },
   });
 
