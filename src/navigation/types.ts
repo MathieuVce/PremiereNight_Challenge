@@ -13,7 +13,7 @@ import { ROUTES } from './staticKeys';
 export type TRootStackParamList = {
   [k in typeof ROUTES.STACK_BOTTOM_TABS]: NavigatorScreenParams<TMainTabParamList>;
 } & {
-  [k in typeof ROUTES.SCREEN_MOVIE_DETAILS]: undefined; // TODO  No params for now
+  [k in typeof ROUTES.SCREEN_MOVIE_DETAILS]: { movieId: number };
 };
 
 /**

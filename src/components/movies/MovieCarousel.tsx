@@ -2,19 +2,12 @@ import React from 'react';
 import {View, Text, FlatList, StyleSheet, ListRenderItem} from 'react-native';
 import {Colors, Typography, Spacing} from '@/theme';
 import MovieCard from './MovieCard';
+import { Movie } from '@/api/tmdb';
 
 /**
  * MovieCarousel Component
  * Displays a horizontal scrolling list of movies with a section title.
  */
-
-// TODO get type from API
-type Movie = {
-  id: number;
-  title: string;
-  poster_path: string | null;
-  release_date: string;
-};
 
 export interface MovieCarouselProps {
   title: string;
