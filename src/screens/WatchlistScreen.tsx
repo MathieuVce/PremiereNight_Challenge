@@ -7,6 +7,7 @@ import {
   ListRenderItem,
   TouchableOpacity,
   Image,
+  SafeAreaView,
 } from 'react-native';
 
 import { ROUTES } from '@/navigation/staticKeys';
@@ -135,7 +136,7 @@ const WatchlistScreen: React.FC<WatchlistScreenProps> = ({navigation}) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <FlatList
         data={watchlistItems}
         renderItem={renderItem}
@@ -147,7 +148,7 @@ const WatchlistScreen: React.FC<WatchlistScreenProps> = ({navigation}) => {
         ListEmptyComponent={renderEmptyState}
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -1,6 +1,6 @@
 import { HomeScreenProps } from '@/navigation/types';
 import React, {useEffect, useMemo, useCallback, useState} from 'react';
-import {ScrollView, StyleSheet, RefreshControl, View, Text, TextInput} from 'react-native';
+import {ScrollView, StyleSheet, RefreshControl, View, Text, TextInput, SafeAreaView} from 'react-native';
 import {Movie} from '@/api/tmdb';
 import {selectGenres, useAppDispatch, useAppSelector} from '@/store';
 import {
@@ -27,12 +27,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [searchMovie, setSearchMovie] = useState<string>('');
 
+  const [nowPlayingPage, setNowPlayingPage] = useState<number>(1);
+  const [popularPage, setPopularPage] = useState<number>(1);
+
   /**
    * Load movies on component mount
    */
   useEffect(() => {
-    loadMovies();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    ((async () => {
+      await loadMovies();
+    }))();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
     /**
@@ -41,8 +46,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const loadMovies = async () => {
     try {
       await Promise.all([
-        dispatch(moviesSlice.loadNowPlayingMovies(1)).unwrap(),
-        dispatch(moviesSlice.loadPopularMovies(1)).unwrap(),
+        dispatch(moviesSlice.loadNowPlayingMovies(nowPlayingPage)).unwrap(),
+        dispatch(moviesSlice.loadPopularMovies(popularPage)).unwrap(),
         dispatch(moviesSlice.loadGenres()).unwrap(),
       ]);
     } catch (err) {
@@ -52,11 +57,40 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     }
   };
 
-  const handleRefresh = async () => {
+   const handleRefresh = async () => {
     setRefreshing(true);
+    setNowPlayingPage(1);
+    setPopularPage(1);
     await loadMovies();
     setRefreshing(false);
   };
+
+  /**
+   * Load more "Now Playing" movies
+   */
+  const handleLoadMoreNowPlaying = useCallback(async () => {
+    try {
+      const nextPage = nowPlayingPage + 1;
+      await dispatch(moviesSlice.loadNowPlayingMovies(nextPage)).unwrap();
+      setNowPlayingPage(nextPage);
+    } catch (err) {
+      console.error('Failed to load more now playing movies:', err);
+    }
+  }, [dispatch, nowPlayingPage]);
+
+  /**
+   * Load more "Popular" movies
+   */
+  const handleLoadMorePopular = useCallback(async () => {
+    try {
+      const nextPage = popularPage + 1;
+      await dispatch(moviesSlice.loadPopularMovies(nextPage)).unwrap();
+      setPopularPage(nextPage);
+    } catch (err) {
+      console.error('Failed to load more popular movies:', err);
+    }
+  }, [dispatch, popularPage]);
+
 
   /**
    * Navigate to movie detail screen
@@ -123,7 +157,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <TextInput
@@ -156,6 +190,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
             title="Now Playing"
             movies={filteredNowPlayingMovies}
             onMoviePress={handleMoviePress}
+            onEndReached={handleLoadMoreNowPlaying}
+            loading={loading}
           />
         )}
 
@@ -165,6 +201,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
             title="Popular"
             movies={filteredPopularMovies}
             onMoviePress={handleMoviePress}
+            onEndReached={handleLoadMorePopular}
+            loading={loading}
           />
         )}
 
@@ -180,7 +218,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
             </View>
           )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -191,7 +229,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: Spacing.base,
-    paddingTop: Spacing['2xl'],
+    paddingTop: Spacing.base,
     paddingBottom: Spacing.xs,
     backgroundColor: Colors.background,
   },

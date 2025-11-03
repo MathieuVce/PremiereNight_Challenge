@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, FlatList, StyleSheet, ListRenderItem} from 'react-native';
+import {View, Text, FlatList, StyleSheet, ListRenderItem, TouchableOpacity, ActivityIndicator} from 'react-native';
 import {Colors, Typography, Spacing} from '@/theme';
 import MovieCard from './MovieCard';
 import { Movie } from '@/api/tmdb';
@@ -25,6 +25,7 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
   movies,
   onMoviePress,
   onEndReached,
+  loading = false,
   testID,
 }) => {
 
@@ -36,6 +37,30 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
    * Extract unique key for each item
    */
   const keyExtractor = (item: Movie) => item.id.toString();
+
+  /**
+   * Render Load More button at the end of the list
+   */
+  const renderFooter = () => {
+    if (!onEndReached) return null;
+
+    return (
+      <TouchableOpacity
+        style={styles.loadMoreContainer}
+        onPress={onEndReached}
+        disabled={loading}
+        testID={`${testID}-load-more-button`}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color={Colors.primary} />
+        ) : (
+          <View style={styles.loadMoreButton}>
+            <Text style={styles.loadMoreText}>Load More</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container} testID={testID}>
@@ -49,8 +74,7 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
       />
     </View>
   );
@@ -68,6 +92,30 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: Spacing.base,
+  },
+  loadMoreContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: Spacing.sm,
+    minWidth: 120,
+  },
+  loadMoreButton: {
+    paddingHorizontal: Spacing.base,
+    paddingVertical: Spacing.base,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderStyle: 'dashed',
+  },
+  loadMoreText: {
+    color: Colors.primary,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: Spacing.xs,
   },
 });
 
