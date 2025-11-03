@@ -27,9 +27,24 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<false/>
-		<key>NSAllowsLocalNetworking</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>themoviedb.org</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>api.themoviedb.org</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>

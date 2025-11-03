@@ -9,7 +9,8 @@ const TMDB_CONFIG = {
   apiKey: '6a30cbfce857a0d11ed468e037c353c8',
   baseURL: 'https://api.themoviedb.org/3',
   imageBaseURL:'https://image.tmdb.org/t/p',
-  timeout: 3000,
+  timeout: 8000,
+  maxRetries: 3,
 };
 
 /**
@@ -21,7 +22,7 @@ const createClient = (): AxiosInstance => {
     timeout: TMDB_CONFIG.timeout,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${TMDB_CONFIG.apiKey}`
+      'Accept': 'application/json',
     },
   });
 
@@ -31,6 +32,12 @@ const createClient = (): AxiosInstance => {
         ...config.params,
         api_key: TMDB_CONFIG.apiKey,
       };
+
+      // iOS specific: Force IPv4
+      if (config.baseURL && !config.headers['X-Requested-With']) {
+        config.headers['X-Requested-With'] = 'XMLHttpRequest';
+      }
+
       return config;
     },
     error => {
@@ -76,7 +83,6 @@ const createClient = (): AxiosInstance => {
 
 /**
  * Helper function to build image URLs
- * TMDB requires specific URL format for images
  */
 export const buildImageUrl = (
   path: string | null,
@@ -90,7 +96,6 @@ export const buildImageUrl = (
 
 /**
  * Helper function to build backdrop image URLs
- * Backdrops use different sizes than posters
  */
 export const buildBackdropUrl = (
   path: string | null,
@@ -104,7 +109,6 @@ export const buildBackdropUrl = (
 
 /**
  * TMDB API client instance
- * Export this to make API calls throughout the app
  */
 export const tmdbClient = createClient();
 
@@ -115,6 +119,6 @@ export const get = async <T>(
   url: string,
   config?: AxiosRequestConfig,
 ): Promise<T> => {
-  const response = await tmdbClient.get<T>(url, config);
-  return response.data;
+    const response = await tmdbClient.get<T>(url, config);
+    return response.data;
 };
