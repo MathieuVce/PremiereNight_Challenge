@@ -62,12 +62,30 @@ const MainTabs = () => {
   );
 };
 
+/* Deep linking configuration
+  const linking: LinkingOptions<TRootStackParamList> = {
+    prefixes: ['premierenight://'],
+    config: {
+      screens: {
+        [ROUTES.STACK_BOTTOM_TABS]: {
+          screens: {
+            [ROUTES.SCREEN_HOME]: 'home',
+            [ROUTES.SCREEN_WATCHLIST]: 'watchlist',
+          },
+        },
+        [ROUTES.SCREEN_MOVIE_DETAILS]: 'movie/:movieId',
+      },
+    },
+  };
+*/
+
 /**
  * Root Stack Navigator
  * Wraps the tab navigator and adds modal screens
  */
 const RootNavigator = () => {
   return (
+    // <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}> -- If using deep links --
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
