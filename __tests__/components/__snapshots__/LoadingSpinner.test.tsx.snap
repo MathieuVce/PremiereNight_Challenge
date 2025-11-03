@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoadingSpinner renders correctly 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "center",
+        "justifyContent": "center",
+        "padding": 36,
+      },
+      false,
+      undefined,
+    ]
+  }
+>
+  <ActivityIndicator
+    color="#5B4B8A"
+    size="large"
+  />
+</View>
+`;

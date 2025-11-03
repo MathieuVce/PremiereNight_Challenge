@@ -1,0 +1,204 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button Component Basic Rendering should match snapshot 1`] = `
+<View
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": false,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "#5B4B8A",
+      "borderRadius": 12,
+      "flexDirection": "row",
+      "justifyContent": "center",
+      "minHeight": 44,
+      "opacity": 1,
+      "paddingHorizontal": 24,
+      "paddingVertical": 18,
+    }
+  }
+>
+  <Text
+    style={
+      [
+        {
+          "textAlign": "center",
+        },
+        {
+          "color": "#FFFFFF",
+        },
+        {
+          "fontFamily": "System",
+          "fontSize": 28,
+          "fontWeight": "500",
+          "lineHeight": 39.199999999999996,
+        },
+        undefined,
+      ]
+    }
+  >
+    Snapshot Test
+  </Text>
+</View>
+`;
+
+exports[`Button Component Watchlist Use Case should match snapshot for add to watchlist state 1`] = `
+<View
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": false,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "#5B4B8A",
+      "borderRadius": 12,
+      "flexDirection": "row",
+      "justifyContent": "center",
+      "minHeight": 44,
+      "opacity": 1,
+      "paddingHorizontal": 24,
+      "paddingVertical": 18,
+    }
+  }
+>
+  <Text
+    style={
+      [
+        {
+          "textAlign": "center",
+        },
+        {
+          "color": "#FFFFFF",
+        },
+        {
+          "fontFamily": "System",
+          "fontSize": 28,
+          "fontWeight": "500",
+          "lineHeight": 39.199999999999996,
+        },
+        undefined,
+      ]
+    }
+  >
+    Add to Watchlist
+  </Text>
+</View>
+`;
+
+exports[`Button Component Watchlist Use Case should match snapshot for remove from watchlist state 1`] = `
+<View
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": false,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "transparent",
+      "borderColor": "#5B4B8A",
+      "borderRadius": 12,
+      "borderWidth": 2,
+      "flexDirection": "row",
+      "justifyContent": "center",
+      "minHeight": 44,
+      "opacity": 1,
+      "paddingHorizontal": 24,
+      "paddingVertical": 18,
+    }
+  }
+>
+  <Text
+    style={
+      [
+        {
+          "textAlign": "center",
+        },
+        {
+          "color": "#5B4B8A",
+        },
+        {
+          "fontFamily": "System",
+          "fontSize": 28,
+          "fontWeight": "500",
+          "lineHeight": 39.199999999999996,
+        },
+        undefined,
+      ]
+    }
+  >
+    Remove from Watchlist
+  </Text>
+</View>
+`;
